@@ -8,13 +8,12 @@ void read_order_log(const string& filename, vector<order_log>& order_logs, int b
         std::cout << "Error: cannot open file " << filename << std::endl;
         exit(1);
     }
-    fseek(fp, start_pos * sizeof(order_log), SEEK_SET); //
-    order_log* buffer = new order_log[batch_size]; // 每次都new?...
-    int read_size = fread(buffer, sizeof(order_log), batch_size, fp);
+    fseek(fp, start_pos * sizeof(order_log), SEEK_SET);
+    order_log* buffer = &Singleton::get_instance().order_logs[0]; // Todo: parralelize this.
+    size_t read_size = fread(buffer, sizeof(order_log), BATCH_SIZE, fp);
     for (int i = 0; i < read_size; ++i) {
         order_logs.emplace_back(buffer[i]);
     }
-    delete[] buffer;
     fclose(fp);
 }
 

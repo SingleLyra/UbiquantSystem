@@ -13,11 +13,13 @@ int main() {
         cout << file << endl;
     }
     vector<order_log> order_logs;
+    cout << "order logs:" << endl;
+    cout << "sizeof order_log: " << sizeof(order_log) << endl; // 32
     for (auto& file: files) {
         if (file.find("order") != string::npos)
         {
-            read_order_log(file, order_logs, 10, 0); // 读取order log. <第0条到第10条>
-            read_order_log(file, order_logs, 5, 5); // 读取order log. <第5条到第10条>
+            read_order_log(file, order_logs, 100, 0); // 读取order log. <第0条到第10条>
+            // read_order_log(file, order_logs, 5, 5); // 读取order log. <第5条到第10条>
             break;
         }
     }
