@@ -17,9 +17,9 @@ int main(int argc, char * argv[]) {
 
     for (auto & date: dates) {
         // prev_tade_info 一次读完
-        size_t prev_trades_size = read_prev_trade_info(date + "prev_trade_info", BATCH_SIZE, 0);
+        size_t prev_trades_size = read_prev_trade_info(Singleton::get_instance().data_path + date + "/prev_trade_info", BATCH_SIZE, 0);
         // alpha 一次读完
-        size_t alphas_size = read_alpha(date + "alpha", BATCH_SIZE, 0);
+        size_t alphas_size = read_alpha(Singleton::get_instance().data_path + date + "/alpha", BATCH_SIZE, 0);
 
         // 计算策略单
         prev_trade_info * prev_trades = Singleton::get_instance().prev_trade_infos;
@@ -54,6 +54,8 @@ int main(int argc, char * argv[]) {
                         twaps[twaps_size].direction = -1;
                         // 时间戳单位是毫秒, * 1000
                         twaps[twaps_size].timestamp = alphas[i].timestamp + j * session_length * 1000;
+                    } else if (target_volume == last_volume) {
+                        continue;
                     }
                     twaps_size++;
                 }
@@ -68,12 +70,13 @@ int main(int argc, char * argv[]) {
             return l.timestamp < r.timestamp;
         });
 
+
         Chuo::Worker worker;
         // 加载昨日收盘信息
         worker.process_prev_trade(Singleton::get_instance().prev_trade_infos, prev_trades_size);
 
         // order 边读边处理
-        string order_filename = date + "order_log";
+        string order_filename = Singleton::get_instance().data_path + date + "/order_log";
         size_t now_order_id = 0, now_twap_order_id = 0;
         order_log * orders = Singleton::get_instance().order_logs;
         bool end = false;
@@ -97,6 +100,14 @@ int main(int argc, char * argv[]) {
                         // 好像就是个void;
                     }
                 } else { // 需要处理 twap_order
+//                    auto& debug_temp = worker.get_instrument(*(unsigned long long *)(twapOrder.instrument_id));
+//                    int pce = worker.get_base_price(debug_temp, order);
+//
+//                    std::cout << "?price " << order.timestamp << " " << pce << std::endl;
+//                    if(strcmp(order.instrument_id, twapOrder.instrument_id) != 0) {
+//                        std::cout << "BUG" << std::endl;
+//                        exit(10086);
+//                    }
                     order_log order_log1 = order_log();
                     order_log1.timestamp = twapOrder.timestamp;
                     order_log1.type = 0;
@@ -110,7 +121,7 @@ int main(int argc, char * argv[]) {
             }
             now_order_id += BATCH_SIZE;
         }
-        worker.calc_pnl_and_pos(Singleton::get_instance().prev_trade_infos, Singleton::get_instance().pnl_and_poses, BATCH_SIZE);
+        worker.calc_pnl_and_pos(Singleton::get_instance().prev_trade_infos, Singleton::get_instance().pnl_and_poses, worker.umap.size());
         worker.output_pnl_and_pos(prev_trades_size, date, session_number, session_length);
         worker.output_twap_order(twaps, twaps_size, date, session_number, session_length);
 

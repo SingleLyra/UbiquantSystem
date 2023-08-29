@@ -34,8 +34,7 @@ namespace Chuo {
     using PQ = rollbear::prio_queue<1024 /* miniheap_size */,
             PriceAndId /* Key first*/,
             Volume /* Value second */, CMP>;
-    using BID_PQ = PQ<std::less<PriceAndId>>;
-    // using ASK_PQ = PQ<std::greater<PriceAndId>>;
+    using BID_PQ = PQ<std::greater<PriceAndId>>; // 再想想.jpg 我去麦当劳(不是)
     using std::unordered_map;
 
     class Worker {
@@ -46,12 +45,14 @@ namespace Chuo {
         struct BidsAndAsks {
             BID_PQ bid;
             BID_PQ ask;
-            int last_price; // 最近成交价 -> 用于更新收盘价.
-            int prev_close_price; // 昨日收盘
-            int bid_sum_volume; // bid volume 总量
-            int ask_sum_volume; // ask volume 总量
+            int last_price = -1; // 最近成交价 -> 用于更新收盘价.
+            int prev_close_price = -1; // 昨日收盘
+            int up_limit = 0;
+            int down_limit = 0;
+            int bid_sum_volume = 0; // bid volume 总量
+            int ask_sum_volume = 0; // ask volume 总量
             int cur_position; // 当前仓位, 和昨日收盘仓位一致;
-            int last_position; // 昨日仓位
+            int last_position = 0; // 昨日仓位
             int cash = 0; // 现金
             double pnl() {
                 return (double)cur_position * price_int2double(last_price) + price_int2double(cash)
@@ -68,15 +69,15 @@ namespace Chuo {
         void process_prev_trade(prev_trade_info prev_trade_infos[], size_t n);
         void calc_pnl_and_pos(prev_trade_info prevTradeInfo[], pnl_and_pos pnl_and_poses[], size_t n);
         BidsAndAsks & get_instrument(unsigned long long instrument_id);
-        void check_valid_PQ(BidsAndAsks & bids_and_asks);
         int get_bid(BidsAndAsks & bids_and_asks);
         int get_ask(BidsAndAsks & bids_and_asks);
         void output_pnl_and_pos(size_t prev_trades_size, string date, int session_number, int session_length);
         void output_twap_order(twap_order twap_orders[], size_t twap_size, string date, int session_number, int session_length);
         // 基准价格
         int get_base_price(BidsAndAsks & bid_and_asks, const order_log & order);
-
-        inline unsigned long long char8_to_ull(const char * instrument_id);
+        inline void add_one_dir(BidsAndAsks & bids_and_asks, int volume, int direction);
+        inline void reduce_one_dir(BidsAndAsks & bids_and_asks, int volume, int direction);
+        unsigned long long char8_to_ull(const char * instrument_id);
 
         int get_price(const order_log & order, bool is_alpha);
         int process_fix_price_order(const order_log& order, bool is_alpha, int price, BID_PQ& pq, BidsAndAsks& bidsAndAsks);

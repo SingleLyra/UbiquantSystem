@@ -42,6 +42,7 @@ size_t read_alpha(const string& filename, int batch_size, int start_pos) {
 }
 
 // 读入 /mnt/data 下的文件夹 (files: 都是日期)
+// example: [20250202, 20160202]
 vector<string> get_dir_files(const string& dir) {
     DIR* dp;
     struct dirent* dirp;
@@ -53,8 +54,7 @@ vector<string> get_dir_files(const string& dir) {
     vector<string> files;
     while ((dirp = readdir(dp)) != nullptr) {
         if(dirp->d_type == DT_DIR && strcmp(dirp->d_name, ".") != 0 && strcmp(dirp->d_name, "..") != 0) {
-            string subdir = dir + dirp->d_name + "/";
-            files.emplace_back(std::move(subdir));
+            files.emplace_back(dirp->d_name);
         }
     }
 

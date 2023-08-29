@@ -43,7 +43,7 @@ struct pnl_and_pos {
     double pnl;
 }__attribute__((packed));
 
-#define BATCH_SIZE 100000
+#define BATCH_SIZE 200000
 
 struct Singleton {
     struct Settings {
