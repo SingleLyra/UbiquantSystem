@@ -1,30 +1,120 @@
-#include "cstdio"
 #include "iostream"
 #include "common.h"
 #include "readlogs.h"
+#include "chuo.h"
+#include <algorithm>
+#include <cstring>
 
 using namespace std;
 
+//
+// $ main.out session_number session_length
+//
+int main(int argc, char * argv[]) {
+    int session_number = stoi(argv[1]);
+    int session_length = stoi(argv[2]);
+    vector<string> dates = get_dir_files(Singleton::get_instance().data_path);
 
-int main() {
-    vector<string> files;
-    get_dir_files(Singleton::get_instance().data_path, files);
-    for (auto& file: files) {
-        cout << file << endl;
-    }
-    vector<order_log> order_logs;
-    cout << "order logs:" << endl;
-    cout << "sizeof order_log: " << sizeof(order_log) << endl; // 32
-    for (auto& file: files) {
-        if (file.find("order") != string::npos)
-        {
-            read_order_log(file, order_logs, 100, 0); // 读取order log. <第0条到第10条>
-            // read_order_log(file, order_logs, 5, 5); // 读取order log. <第5条到第10条>
-            break;
+    for (auto & date: dates) {
+        // prev_tade_info 一次读完
+        size_t prev_trades_size = read_prev_trade_info(date + "prev_trade_info", BATCH_SIZE, 0);
+        // alpha 一次读完
+        size_t alphas_size = read_alpha(date + "alpha", BATCH_SIZE, 0);
+
+        // 计算策略单
+        prev_trade_info * prev_trades = Singleton::get_instance().prev_trade_infos;
+        alpha * alphas = Singleton::get_instance().alphas;
+        twap_order * twaps = Singleton::get_instance().twap_orders;
+        unordered_map<string, int /* Volume */> instrument_volume;
+        size_t twaps_size = 0;
+        // 1. load 昨日仓位
+        for (int i = 0; i < prev_trades_size; i++) {
+            string instrument = string(prev_trades[i].instrument_id);
+            instrument_volume[instrument] = prev_trades[i].prev_position;
         }
-    }
-    for (auto& order_log: order_logs) {
-        cout << order_log.instrument_id << " " << order_log.timestamp << " " << order_log.type << " " << order_log.direction << " " << order_log.volume << " " << order_log.price_off << endl;
+        // 2. 信号生成策略单
+        for (int i = 0; i < alphas_size; i++) {
+            string instrument = string(alphas[i].instrument_id);
+            auto it = instrument_volume.find(instrument);
+            if (it != instrument_volume.end()) {
+                // 之前有信号
+                int last_volume = it->second;
+                int target_volume = alphas[i].target_volume;
+                for (int j = 0; j < session_number; j++) {
+                    memcpy(twaps[twaps_size].instrument_id, alphas[i].instrument_id, sizeof(alphas[i].instrument_id));
+                    if (target_volume > last_volume) {
+                        // 买入
+                        twaps[twaps_size].volume = (target_volume - last_volume) / session_number;
+                        twaps[twaps_size].direction = 1;
+                        // 时间戳单位是毫秒, * 1000
+                        twaps[twaps_size].timestamp = alphas[i].timestamp + j * session_length * 1000;
+                    } else if (target_volume < last_volume) {
+                        // 卖出
+                        twaps[twaps_size].volume = (last_volume - target_volume) / session_number;
+                        twaps[twaps_size].direction = -1;
+                        // 时间戳单位是毫秒, * 1000
+                        twaps[twaps_size].timestamp = alphas[i].timestamp + j * session_length * 1000;
+                    }
+                    twaps_size++;
+                }
+                it->second = target_volume;
+            } else {
+                // BUG
+                exit(10086);
+            }
+        }
+        // 3. 策略单排序
+        sort(twaps, twaps + twaps_size, [](const twap_order & l, const twap_order & r) {
+            return l.timestamp < r.timestamp;
+        });
+
+        Chuo::Worker worker;
+        // 加载昨日收盘信息
+        worker.process_prev_trade(Singleton::get_instance().prev_trade_infos, prev_trades_size);
+
+        // order 边读边处理
+        string order_filename = date + "order_log";
+        size_t now_order_id = 0, now_twap_order_id = 0;
+        order_log * orders = Singleton::get_instance().order_logs;
+        bool end = false;
+        while (!end) {
+            size_t order_len = read_order_log(order_filename, BATCH_SIZE, now_order_id);
+            // 判断是否读完
+            if (order_len < BATCH_SIZE) {
+                end = true;
+            }
+            // 按照时间顺序处理 make_order
+            for(int i = 0; i < order_len; i++) {
+                order_log& order = orders[i];
+                twap_order& twapOrder = twaps[now_twap_order_id];
+                // 1. 通过时间戳判断是否需要处理 twap_order
+                //    或者 所有的信号都处理完毕了
+                if(now_twap_order_id >= twaps_size || order.timestamp <= twapOrder.timestamp) { // 需要处理 order
+                    int price = worker.make_order(order, false);
+                    if(price == -1) {
+                        ;// 无法成交;
+                    } else {
+                        // 好像就是个void;
+                    }
+                } else { // 需要处理 twap_order
+                    order_log order_log1 = order_log();
+                    order_log1.timestamp = twapOrder.timestamp;
+                    order_log1.type = 0;
+                    order_log1.direction = twapOrder.direction;
+                    order_log1.volume = twapOrder.volume;
+                    memcpy(order_log1.instrument_id, twapOrder.instrument_id, 8); // 8个char.
+                    int price = worker.make_order(order_log1, true);
+                    twapOrder.price = Chuo::price_int2double(price);
+                    now_twap_order_id++;
+                }
+            }
+            now_order_id += BATCH_SIZE;
+        }
+        worker.calc_pnl_and_pos(Singleton::get_instance().prev_trade_infos, Singleton::get_instance().pnl_and_poses, BATCH_SIZE);
+        worker.output_pnl_and_pos(prev_trades_size, date, session_number, session_length);
+        worker.output_twap_order(twaps, twaps_size, date, session_number, session_length);
+
+        return 0;
     }
     return 0;
 }

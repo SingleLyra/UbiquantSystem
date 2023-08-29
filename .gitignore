@@ -1,3 +1,6 @@
 build/
 submodule/
 .cache/
+.idea/
+# Project exclude paths
+/cmake-build-debug/
