@@ -21,8 +21,9 @@ void start_read_order(const string& date) {
     }
 }
 
-size_t read_order_log(int batch_size) {
-    size_t read_size = fread(order_logs, sizeof(order_log), BATCH_SIZE, order_fp);
+size_t read_order_log(std::vector<order_log> &vec, int batch_size) {
+    vec.resize(BATCH_SIZE);
+    size_t read_size = fread(vec.data(), sizeof(order_log), BATCH_SIZE, order_fp);
     return read_size;
 }
 

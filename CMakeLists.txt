@@ -13,15 +13,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops") # 启用循环展开优
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto") # 启用链接时优化
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -finline-functions") # 启用内联函数优化
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fomit-frame-pointer") # 不使用 frame pointer
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread") # link pthread
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(prio REQUIRED)
 
-# find_package(Boost REQUIRED COMPONENTS filesystem)
-
 aux_source_directory(./src SRC)
 add_executable(main ${SRC})
 target_include_directories(main PUBLIC ${PRIO_INCLUDES})
-
-# target_link_libraries(main Boost::filesystem)
