@@ -6,6 +6,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include <fenv.h>
 // #include <numaif.h>
 
 using namespace std;
@@ -83,28 +84,25 @@ struct OneSessionWorker {
         });
     }
 
-    void work_all_order(order_log * order_logs, size_t order_len) {
-        for(int i = 0; i < order_len; i++) {
-            order_log& order = order_logs[i];
-            while (now_twap_order_id < twaps_size && twap_orders[now_twap_order_id].timestamp < order.timestamp) {
-                twap_order& twapOrder = twap_orders[now_twap_order_id];
-                order_log order_log1 = order_log {
-                        .timestamp =  twapOrder.timestamp,
-                        .type = 0,
-                        .direction = twapOrder.direction,
-                        .volume = twapOrder.volume,
-                };
-                memcpy(order_log1.instrument_id, twapOrder.instrument_id, 8);
-                int price = worker.make_order(order_log1, true);
-                twapOrder.price = Chuo::price_int2double(price);
-                now_twap_order_id++;
-            }
-            worker.make_order(order, false);
+    void work_order(const order_log & order) {
+        while (now_twap_order_id < twaps_size && twap_orders[now_twap_order_id].timestamp < order.timestamp) {
+            twap_order& twapOrder = twap_orders[now_twap_order_id];
+            order_log order_log1 = order_log {
+                    .timestamp =  twapOrder.timestamp,
+                    .type = 0,
+                    .direction = twapOrder.direction,
+                    .volume = twapOrder.volume,
+            };
+            memcpy(order_log1.instrument_id, twapOrder.instrument_id, 8);
+            int price = worker.make_order(order_log1, true);
+            twapOrder.price = Chuo::price_int2double(price);
+            now_twap_order_id++;
         }
+        worker.make_order(order, false);
     }
 
     void output_answer(const string & date) {
-        worker.calc_pnl_and_pos(prev_trade_infos, pnl_and_poses, worker.umap.size());
+        worker.calc_pnl_and_pos(prev_trade_infos, pnl_and_poses, worker.umap.size() - 1); // magic number: size - 1
         worker.output_pnl_and_pos(prev_trades_size, date, session_number, session_length);
         worker.output_twap_order(twap_orders, twaps_size, date, session_number, session_length);
     }
@@ -150,8 +148,11 @@ void deal_orders(const string & date) {
             break;
         }
 
-        for (int i = 0; i < 5; i++) {
-            worker[i].work_all_order(batch.data(), batch.size());
+        int size = batch.size();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < 5; j++) {
+                worker[j].work_order(batch[i]);
+            }
         }
     }
 
@@ -162,6 +163,7 @@ void deal_orders(const string & date) {
 
 int main(int argc, char * argv[]) {
     string date(argv[1]);
+    fesetround(FE_TONEAREST); // use rint replace round, faster
 
     size_t prev_trades_size = read_prev_trade_info(date);
     size_t alphas_size = read_alpha(date);

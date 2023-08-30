@@ -4,17 +4,15 @@
 #include <cmath>
 #include <cstring>
 #include <cstdio>
-
-typedef long long ll;
+#include <fenv.h>
 
 namespace Chuo {
+    // ======================================
+    // =========== 调用频繁 ==================
+    // ======================================
 
     int price_double2int(double price) { // price只有2位小数， *100四舍五入
-        return round(price * 100);
-    }
-
-    double price_int2double(int price) { // price只有2位小数， /100
-        return (double)price / 100;
+        return rint(price * 100);
     }
 
     int round_mul(int price, int x) {
@@ -26,11 +24,18 @@ namespace Chuo {
         }
     }
 
+    // ======================================
+    // ======================================
+    // ======================================
+
+    double price_int2double(int price) { // price只有2位小数， /100
+        return ((double) price) / 100;
+    }
+
     Worker::Worker() {
         umap.reserve(3513);
     }
 
-    // 加载昨日收盘价格
     void Worker::process_prev_trade(prev_trade_info prev_trade_infos[], size_t n) {
         for (int i = 0; i < n; i++) {
             auto & bid_and_asks = get_instrument(char8_to_ull(prev_trade_infos[i].instrument_id));
@@ -82,15 +87,19 @@ namespace Chuo {
         fclose(fp);
     }
 
+    // ======================================
+    // =========== 调用频繁 ==================
+    // ======================================
+
     Worker::BidsAndAsks & Worker::get_instrument(unsigned long long instrument_id) {
         return umap[instrument_id];
     }
 
-    int Worker::get_bid(BidsAndAsks & bids_and_asks) {
+    int Worker::get_bid(BidsAndAsks & bids_and_asks) const {
         return bids_and_asks.bid.top().price;
     }
 
-    int Worker::get_ask(BidsAndAsks & bids_and_asks) {
+    int Worker::get_ask(BidsAndAsks & bids_and_asks) const {
         return -bids_and_asks.ask.top().price;
     }
 
@@ -134,15 +143,6 @@ namespace Chuo {
         return *(unsigned long long *)(instrument_id);
     }
 
-    static int debug_msg = 0;
-    static int trade_num = 0;
-    const int debug_limit = 4500;
-    static bool debug_mode = true;
-    static string debug_instrument_id = "030.UBE";
-    static bool debug_orders = false;
-    static bool debug_trade = true;
-    static FILE *fp = fopen("debuglog.txt","w");
-
     int Worker::get_price(const order_log & order, bool is_alpha) {
         auto & bids_and_asks = get_instrument(char8_to_ull(order.instrument_id));
         switch (order.type) {
@@ -156,23 +156,23 @@ namespace Chuo {
                 }
 
                 // 0.98~1.02
-                int price_off = price_double2int(order.price_off);
-                if (price_off + base_price < bids_and_asks.down_limit) {
+                int price_off_addbase = price_double2int(order.price_off) + base_price;
+                if (price_off_addbase < bids_and_asks.down_limit) {
                     return -1;
                 }
-                if (price_off + base_price > bids_and_asks.up_limit) {
+                if (price_off_addbase> bids_and_asks.up_limit) {
                     return -1;
                 }
                 if (order.direction == 1) {
-                    if (price_off + base_price > round_mul(102, base_price)) {
+                    if (price_off_addbase > round_mul(102, base_price)) {
                         return -1;
                     }
                 } else {
-                    if (price_off + base_price < round_mul(98, base_price)) {
+                    if (price_off_addbase < round_mul(98, base_price)) {
                         return -1;
                     }
                 }
-                return base_price + price_off; // 限价申报的价格, 入队.
+                return price_off_addbase; // 限价申报的价格, 入队.
             }
             case 1: // 对手方最优价格申报, 订单可能入队
             {
@@ -358,22 +358,25 @@ namespace Chuo {
             }
             case 3: // 最优五档即时成交剩余撤销, 可以成交一部分就不返回-1.
             {
-                int vol = process_dynamic_price_order_level_5(order, pq_diff, bids_and_asks); // 剩余撤销了;
+                process_dynamic_price_order_level_5(order, pq_diff, bids_and_asks); // 剩余撤销了;
                 break;
             }
             case 4: // 即时成交剩余撤销申报, 可以成交一部分就不返回-1.
             {
-                int vol = process_dynamic_price_order_level_5(order, pq_diff, bids_and_asks); // 剩余撤销了;
+                process_dynamic_price_order_level_5(order, pq_diff, bids_and_asks); // 剩余撤销了;
                 break;
             }
             case 5: // 全额成交或撤销申报, 可以全部成交才不返回-1.
             {
                 // 到这里已经检验了仓位一定可行;
-                int vol = process_dynamic_price_order_level_5(order, pq_diff, bids_and_asks); // 剩余撤销了;
+                process_dynamic_price_order_level_5(order, pq_diff, bids_and_asks); // 剩余撤销了;
                 break;
             }
         }
         return 0;
     }
 
+    // ======================================
+    // ======================================
+    // ======================================
 };

@@ -42,7 +42,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -march=native -mtune=native -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2"
+					"fragment" : " -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2"
 				},
 				{
 					"fragment" : "-std=c++17"
@@ -80,7 +80,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-march=native -mtune=native -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2",
+				"fragment" : "-march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2",
 				"role" : "flags"
 			},
 			{

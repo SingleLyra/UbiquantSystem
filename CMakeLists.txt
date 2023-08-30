@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 #一些优化开关
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2") # O2
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native") # 针对当前机器的 CPU 架构和调整进行优化
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native -fno-trapping-math") # 针对当前机器的 CPU 架构和调整进行优化
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops") # 启用循环展开优化
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto") # 启用链接时优化
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -finline-functions") # 启用内联函数优化

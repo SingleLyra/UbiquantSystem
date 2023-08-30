@@ -233,7 +233,11 @@ CMakeFiles/main.dir/src/chuo.cpp.o: ../src/chuo.cpp \
   /usr/include/c++/8/tr1/modified_bessel_func.tcc \
   /usr/include/c++/8/tr1/poly_hermite.tcc \
   /usr/include/c++/8/tr1/poly_laguerre.tcc \
-  /usr/include/c++/8/tr1/riemann_zeta.tcc
+  /usr/include/c++/8/tr1/riemann_zeta.tcc \
+  /usr/include/c++/8/fenv.h \
+  /usr/include/fenv.h \
+  /usr/include/bits/fenv.h \
+  /usr/include/bits/fenvinline.h
 
 CMakeFiles/main.dir/src/common.cpp.o: ../src/common.cpp \
   /usr/include/stdc-predef.h \
@@ -643,7 +647,11 @@ CMakeFiles/main.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/include/c++/8/bits/atomic_base.h \
   /usr/include/c++/8/bits/atomic_lockfree_defines.h \
   /usr/include/c++/8/backward/auto_ptr.h \
-  /usr/include/c++/8/condition_variable
+  /usr/include/c++/8/condition_variable \
+  /usr/include/c++/8/fenv.h \
+  /usr/include/fenv.h \
+  /usr/include/bits/fenv.h \
+  /usr/include/bits/fenvinline.h
 
 CMakeFiles/main.dir/src/readlogs.cpp.o: ../src/readlogs.cpp \
   /usr/include/stdc-predef.h \
@@ -1034,6 +1042,14 @@ CMakeFiles/main.dir/src/writetrade.cpp.o: ../src/writetrade.cpp \
 ../src/readlogs.h:
 
 ../src/common.cpp:
+
+/usr/include/bits/fenvinline.h:
+
+/usr/include/bits/fenv.h:
+
+/usr/include/fenv.h:
+
+/usr/include/c++/8/fenv.h:
 
 /usr/include/c++/8/tr1/riemann_zeta.tcc:
 

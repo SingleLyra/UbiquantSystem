@@ -20,9 +20,6 @@ namespace Chuo {
         bool operator<(const PriceAndIdAndVolume & rhs) const {
             return price == rhs.price ? order_id < rhs.order_id : price < rhs.price;
         }
-        bool operator>(const PriceAndIdAndVolume & rhs) const {
-            return price == rhs.price ? order_id < rhs.order_id : price > rhs.price;
-        }
     };
 
     int price_double2int(double price);
@@ -62,8 +59,8 @@ namespace Chuo {
         void process_prev_trade(prev_trade_info prev_trade_infos[], size_t n);
         void calc_pnl_and_pos(prev_trade_info prevTradeInfo[], pnl_and_pos pnl_and_poses[], size_t n);
         BidsAndAsks & get_instrument(unsigned long long instrument_id);
-        int get_bid(BidsAndAsks & bids_and_asks);
-        int get_ask(BidsAndAsks & bids_and_asks);
+        int get_bid(BidsAndAsks & bids_and_asks) const;
+        int get_ask(BidsAndAsks & bids_and_asks) const;
         void output_pnl_and_pos(size_t prev_trades_size, string date, int session_number, int session_length);
         void output_twap_order(twap_order twap_orders[], size_t twap_size, string date, int session_number, int session_length);
         // 基准价格
