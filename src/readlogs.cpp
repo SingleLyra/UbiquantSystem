@@ -1,17 +1,21 @@
 #include <dirent.h>
 #include <cstring>
+#include <string>
+#include <unordered_map>
 #include "readlogs.h"
 
+std::unordered_map<string, FILE *> files;
 size_t read_order_log(const string& filename, int batch_size, int start_pos) {
-    FILE* fp = fopen(filename.c_str(), "rb");
-    if (fp == nullptr) {
-        std::cout << "Error: cannot open file " << filename << std::endl;
-        exit(1);
+    auto it = files.find(filename);
+    FILE * fp = nullptr;
+    if (it != files.end()) {
+        fp = it->second;
+    } else {
+        fp = fopen(filename.c_str(), "rb");
+        files[filename] = fp;
     }
-    fseek(fp, (long int)start_pos * sizeof(order_log), SEEK_SET);
     order_log* buffer = Singleton::get_instance().order_logs;
     size_t read_size = fread(buffer, sizeof(order_log), BATCH_SIZE, fp);
-    fclose(fp);
     return read_size;
 }
 

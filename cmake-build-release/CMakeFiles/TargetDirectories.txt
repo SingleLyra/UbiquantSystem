@@ -1,3 +1,0 @@
-/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles/rebuild_cache.dir
-/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles/main.dir
-/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles/edit_cache.dir

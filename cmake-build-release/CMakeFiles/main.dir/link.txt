@@ -1,1 +1,0 @@
-/usr/bin/g++ -O3 -DNDEBUG CMakeFiles/main.dir/src/chuo.cpp.o CMakeFiles/main.dir/src/main.cpp.o CMakeFiles/main.dir/src/readlogs.cpp.o CMakeFiles/main.dir/src/writetrade.cpp.o -o main 

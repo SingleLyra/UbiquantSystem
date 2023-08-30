@@ -4,8 +4,15 @@
 #include "chuo.h"
 #include <algorithm>
 #include <cstring>
+#include <cmath>
 
 using namespace std;
+
+#define debugmode
+
+#ifdef debugmode
+static int debug_cnt = 0;
+#endif
 
 //
 // $ main.out session_number session_length
@@ -36,45 +43,39 @@ int main(int argc, char * argv[]) {
         for (int i = 0; i < alphas_size; i++) {
             string instrument = string(alphas[i].instrument_id);
             auto it = instrument_volume.find(instrument);
-            if (it != instrument_volume.end()) {
-                // 之前有信号
-                int last_volume = it->second;
-                int target_volume = alphas[i].target_volume;
-                for (int j = 0; j < session_number; j++) {
-                    memcpy(twaps[twaps_size].instrument_id, alphas[i].instrument_id, sizeof(alphas[i].instrument_id));
-                    if (target_volume > last_volume) {
-                        // 买入
-                        twaps[twaps_size].volume = (target_volume - last_volume) / session_number;
-                        twaps[twaps_size].direction = 1;
-                        // 时间戳单位是毫秒, * 1000
-                        twaps[twaps_size].timestamp = alphas[i].timestamp + j * session_length * 1000;
-                    } else if (target_volume < last_volume) {
-                        // 卖出
-                        twaps[twaps_size].volume = (last_volume - target_volume) / session_number;
-                        twaps[twaps_size].direction = -1;
-                        // 时间戳单位是毫秒, * 1000
-                        twaps[twaps_size].timestamp = alphas[i].timestamp + j * session_length * 1000;
-                    } else if (target_volume == last_volume) {
-                        continue;
-                    }
-                    twaps_size++;
+            // 之前有信号
+            int last_volume = it->second;
+            int target_volume = alphas[i].target_volume;
+            for (int j = 0; j < session_number; j++) {
+                memcpy(twaps[twaps_size].instrument_id, alphas[i].instrument_id, sizeof(alphas[i].instrument_id));
+                if (target_volume > last_volume) {
+                    // 买入
+                    twaps[twaps_size].volume = int(1.0*(target_volume - last_volume)*(j+1)/ session_number) - int(1.0*(target_volume - last_volume)*(j)/ session_number);
+                    // org: (target_volume - last_volume) / session_number;
+                    twaps[twaps_size].direction = 1;
+                    // 时间戳单位是毫秒, * 1000
+                    twaps[twaps_size].timestamp = alphas[i].timestamp + j * session_length * 1000;
+                } else if (target_volume < last_volume) {
+                    // 卖出
+                    twaps[twaps_size].volume = int(1.0*(last_volume - target_volume)*(j+1)/ session_number) - int(1.0*(last_volume - target_volume)*(j)/ session_number);
+                    twaps[twaps_size].direction = -1;
+                    // 时间戳单位是毫秒, * 1000
+                    twaps[twaps_size].timestamp = alphas[i].timestamp + j * session_length * 1000;
+                } else if (target_volume == last_volume) {
+                    continue;
                 }
-                it->second = target_volume;
-            } else {
-                // BUG
-                exit(10086);
+                twaps_size++;
             }
+            it->second = target_volume;
         }
         // 3. 策略单排序
         sort(twaps, twaps + twaps_size, [](const twap_order & l, const twap_order & r) {
             return l.timestamp < r.timestamp;
         });
 
-
         Chuo::Worker worker;
         // 加载昨日收盘信息
         worker.process_prev_trade(Singleton::get_instance().prev_trade_infos, prev_trades_size);
-
         // order 边读边处理
         string order_filename = Singleton::get_instance().data_path + date + "/order_log";
         size_t now_order_id = 0, now_twap_order_id = 0;
@@ -89,25 +90,8 @@ int main(int argc, char * argv[]) {
             // 按照时间顺序处理 make_order
             for(int i = 0; i < order_len; i++) {
                 order_log& order = orders[i];
-                twap_order& twapOrder = twaps[now_twap_order_id];
-                // 1. 通过时间戳判断是否需要处理 twap_order
-                //    或者 所有的信号都处理完毕了
-                if(now_twap_order_id >= twaps_size || order.timestamp <= twapOrder.timestamp) { // 需要处理 order
-                    int price = worker.make_order(order, false);
-                    if(price == -1) {
-                        ;// 无法成交;
-                    } else {
-                        // 好像就是个void;
-                    }
-                } else { // 需要处理 twap_order
-//                    auto& debug_temp = worker.get_instrument(*(unsigned long long *)(twapOrder.instrument_id));
-//                    int pce = worker.get_base_price(debug_temp, order);
-//
-//                    std::cout << "?price " << order.timestamp << " " << pce << std::endl;
-//                    if(strcmp(order.instrument_id, twapOrder.instrument_id) != 0) {
-//                        std::cout << "BUG" << std::endl;
-//                        exit(10086);
-//                    }
+                while (now_twap_order_id < twaps_size && twaps[now_twap_order_id].timestamp < order.timestamp) {
+                    twap_order& twapOrder = twaps[now_twap_order_id];
                     order_log order_log1 = order_log();
                     order_log1.timestamp = twapOrder.timestamp;
                     order_log1.type = 0;
@@ -118,6 +102,7 @@ int main(int argc, char * argv[]) {
                     twapOrder.price = Chuo::price_int2double(price);
                     now_twap_order_id++;
                 }
+                worker.make_order(order, false);
             }
             now_order_id += BATCH_SIZE;
         }
