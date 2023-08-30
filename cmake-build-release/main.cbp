@@ -88,6 +88,12 @@
 		<Unit filename="/home/team9/UbiquantSystem/src/chuo.h">
 			<Option target="main"/>
 		</Unit>
+		<Unit filename="/home/team9/UbiquantSystem/src/common.cpp">
+			<Option target="main"/>
+		</Unit>
+		<Unit filename="/home/team9/UbiquantSystem/src/common.h">
+			<Option target="main"/>
+		</Unit>
 		<Unit filename="/home/team9/UbiquantSystem/src/main.cpp">
 			<Option target="main"/>
 		</Unit>

@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/team9/UbiquantSystem/submodules/prio_queue
 
-CXX_FLAGS = -O3 -DNDEBUG -std=c++17
+CXX_FLAGS =  -march=native -mtune=native -funroll-loops -flto -finline-functions -fomit-frame-pointer -O3 -DNDEBUG -O2 -std=c++17
 

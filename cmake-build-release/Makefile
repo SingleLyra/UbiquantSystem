@@ -153,6 +153,30 @@ src/chuo.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/chuo.cpp.s
 .PHONY : src/chuo.cpp.s
 
+src/common.o: src/common.cpp.o
+.PHONY : src/common.o
+
+# target to build an object file
+src/common.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/common.cpp.o
+.PHONY : src/common.cpp.o
+
+src/common.i: src/common.cpp.i
+.PHONY : src/common.i
+
+# target to preprocess a source file
+src/common.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/common.cpp.i
+.PHONY : src/common.cpp.i
+
+src/common.s: src/common.cpp.s
+.PHONY : src/common.s
+
+# target to generate assembly for a file
+src/common.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/common.cpp.s
+.PHONY : src/common.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -237,6 +261,9 @@ help:
 	@echo "... src/chuo.o"
 	@echo "... src/chuo.i"
 	@echo "... src/chuo.s"
+	@echo "... src/common.o"
+	@echo "... src/common.i"
+	@echo "... src/common.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

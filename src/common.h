@@ -4,7 +4,6 @@
 #include <iostream>
 #include <vector>
 
-
 using std::string;
 using std::vector;
 
@@ -43,21 +42,27 @@ struct pnl_and_pos {
     double pnl;
 }__attribute__((packed));
 
-#define BATCH_SIZE 200000
+// 数据路径
+const string data_path = "/mnt/data/";
 
-struct Singleton {
-    struct Settings {
-        const string data_path = "/mnt/data/";
-        order_log order_logs[BATCH_SIZE];
-        prev_trade_info prev_trade_infos[BATCH_SIZE];
-        alpha alphas[BATCH_SIZE];
-        twap_order twap_orders[BATCH_SIZE];
-        pnl_and_pos pnl_and_poses[BATCH_SIZE];
-    };
-    static Settings& get_instance() {
-        static Settings instance;
-        return instance;
-    }
-};
+// 单次读入量
+const int BATCH_SIZE = 1000000;
+extern order_log order_logs[BATCH_SIZE];
+
+// 150 合约
+const int MAX_PREV_TRADES = 1000;
+extern prev_trade_info prev_trade_infos[MAX_PREV_TRADES];
+
+// 150 合约 * 480 信号 = 72000
+const int MAX_ALPHAS = 100000;
+extern alpha alphas[MAX_ALPHAS];
+
+// 72000 * 5 (session_number) = 36w
+const int MAX_TWAP_ORDERS = 400000;
+extern twap_order twap_orders[MAX_TWAP_ORDERS];
+
+// 150 合约
+const int MAX_PNL_ANS_POSES = 1000;
+extern pnl_and_pos pnl_and_poses[MAX_PNL_ANS_POSES];
 
 #endif //MAIN_COMMON_H

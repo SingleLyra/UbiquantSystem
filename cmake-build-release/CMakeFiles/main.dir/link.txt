@@ -1,1 +1,1 @@
-/usr/bin/g++ -O3 -DNDEBUG CMakeFiles/main.dir/src/chuo.cpp.o CMakeFiles/main.dir/src/main.cpp.o CMakeFiles/main.dir/src/readlogs.cpp.o CMakeFiles/main.dir/src/writetrade.cpp.o -o main 
+/usr/bin/g++  -march=native -mtune=native -funroll-loops -flto -finline-functions -fomit-frame-pointer -O3 -DNDEBUG -O2 CMakeFiles/main.dir/src/chuo.cpp.o CMakeFiles/main.dir/src/common.cpp.o CMakeFiles/main.dir/src/main.cpp.o CMakeFiles/main.dir/src/readlogs.cpp.o CMakeFiles/main.dir/src/writetrade.cpp.o -o main 

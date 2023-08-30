@@ -83,10 +83,24 @@ CMakeFiles/main.dir/src/chuo.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/chuo.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/team9/UbiquantSystem/src/chuo.cpp -o CMakeFiles/main.dir/src/chuo.cpp.s
 
+CMakeFiles/main.dir/src/common.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/common.cpp.o: ../src/common.cpp
+CMakeFiles/main.dir/src/common.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/common.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/common.cpp.o -MF CMakeFiles/main.dir/src/common.cpp.o.d -o CMakeFiles/main.dir/src/common.cpp.o -c /home/team9/UbiquantSystem/src/common.cpp
+
+CMakeFiles/main.dir/src/common.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/common.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/team9/UbiquantSystem/src/common.cpp > CMakeFiles/main.dir/src/common.cpp.i
+
+CMakeFiles/main.dir/src/common.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/common.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/team9/UbiquantSystem/src/common.cpp -o CMakeFiles/main.dir/src/common.cpp.s
+
 CMakeFiles/main.dir/src/main.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/main.dir/src/main.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/main.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/main.cpp.o -MF CMakeFiles/main.dir/src/main.cpp.o.d -o CMakeFiles/main.dir/src/main.cpp.o -c /home/team9/UbiquantSystem/src/main.cpp
 
 CMakeFiles/main.dir/src/main.cpp.i: cmake_force
@@ -100,7 +114,7 @@ CMakeFiles/main.dir/src/main.cpp.s: cmake_force
 CMakeFiles/main.dir/src/readlogs.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/readlogs.cpp.o: ../src/readlogs.cpp
 CMakeFiles/main.dir/src/readlogs.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/readlogs.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/readlogs.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/readlogs.cpp.o -MF CMakeFiles/main.dir/src/readlogs.cpp.o.d -o CMakeFiles/main.dir/src/readlogs.cpp.o -c /home/team9/UbiquantSystem/src/readlogs.cpp
 
 CMakeFiles/main.dir/src/readlogs.cpp.i: cmake_force
@@ -114,7 +128,7 @@ CMakeFiles/main.dir/src/readlogs.cpp.s: cmake_force
 CMakeFiles/main.dir/src/writetrade.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/writetrade.cpp.o: ../src/writetrade.cpp
 CMakeFiles/main.dir/src/writetrade.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/writetrade.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/writetrade.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/writetrade.cpp.o -MF CMakeFiles/main.dir/src/writetrade.cpp.o.d -o CMakeFiles/main.dir/src/writetrade.cpp.o -c /home/team9/UbiquantSystem/src/writetrade.cpp
 
 CMakeFiles/main.dir/src/writetrade.cpp.i: cmake_force
@@ -128,6 +142,7 @@ CMakeFiles/main.dir/src/writetrade.cpp.s: cmake_force
 # Object files for target main
 main_OBJECTS = \
 "CMakeFiles/main.dir/src/chuo.cpp.o" \
+"CMakeFiles/main.dir/src/common.cpp.o" \
 "CMakeFiles/main.dir/src/main.cpp.o" \
 "CMakeFiles/main.dir/src/readlogs.cpp.o" \
 "CMakeFiles/main.dir/src/writetrade.cpp.o"
@@ -136,12 +151,13 @@ main_OBJECTS = \
 main_EXTERNAL_OBJECTS =
 
 main: CMakeFiles/main.dir/src/chuo.cpp.o
+main: CMakeFiles/main.dir/src/common.cpp.o
 main: CMakeFiles/main.dir/src/main.cpp.o
 main: CMakeFiles/main.dir/src/readlogs.cpp.o
 main: CMakeFiles/main.dir/src/writetrade.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/team9/UbiquantSystem/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
