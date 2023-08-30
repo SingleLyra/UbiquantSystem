@@ -11,12 +11,10 @@ start=$(date +%s%N)
 
 for i in $(ls /mnt/data)
 do
-  ./cmake-build-release/main $i 3 1 &
-  ./cmake-build-release/main $i 3 3 &
-  ./cmake-build-release/main $i 3 5 &
-  ./cmake-build-release/main $i 5 2 &
-  ./cmake-build-release/main $i 5 3 &
+  ./cmake-build-release/main $i &
 done
+
+wait
 
 # 输出运行时间
 end=$(date +%s%N)

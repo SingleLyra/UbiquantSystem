@@ -20,9 +20,6 @@ namespace Chuo {
         bool operator<(const PriceAndIdAndVolume & rhs) const {
             return price == rhs.price ? order_id < rhs.order_id : price < rhs.price;
         }
-        bool operator>(const PriceAndIdAndVolume & rhs) const {
-            return price == rhs.price ? order_id < rhs.order_id : price > rhs.price;
-        }
     };
 
     int price_double2int(double price);
@@ -61,16 +58,15 @@ namespace Chuo {
 
         void process_prev_trade(prev_trade_info prev_trade_infos[], size_t n);
         void calc_pnl_and_pos(prev_trade_info prevTradeInfo[], pnl_and_pos pnl_and_poses[], size_t n);
-        BidsAndAsks & get_instrument(unsigned long long instrument_id);
-        int get_bid(BidsAndAsks & bids_and_asks);
-        int get_ask(BidsAndAsks & bids_and_asks);
+        BidsAndAsks & get_instrument(const char * instrument_id);
+        int get_bid(BidsAndAsks & bids_and_asks) const;
+        int get_ask(BidsAndAsks & bids_and_asks) const;
         void output_pnl_and_pos(size_t prev_trades_size, string date, int session_number, int session_length);
         void output_twap_order(twap_order twap_orders[], size_t twap_size, string date, int session_number, int session_length);
         // 基准价格
         int get_base_price(BidsAndAsks & bid_and_asks, const order_log & order);
         inline void add_one_dir(BidsAndAsks & bids_and_asks, int volume, int direction);
         inline void reduce_one_dir(BidsAndAsks & bids_and_asks, int volume, int direction);
-        unsigned long long char8_to_ull(const char * instrument_id);
 
         int get_price(const order_log & order, bool is_alpha);
         int process_fix_price_order(const order_log& order, bool is_alpha, int price, BID_PQ& pq, BidsAndAsks& bidsAndAsks);

@@ -46,7 +46,7 @@ struct pnl_and_pos {
 const string data_path = "/mnt/data/";
 
 // 单次读入量
-const int BATCH_SIZE = 1000000;
+const int BATCH_SIZE = 200000;
 extern order_log order_logs[BATCH_SIZE];
 
 // 150 合约
