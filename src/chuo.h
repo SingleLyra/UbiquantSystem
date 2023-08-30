@@ -53,9 +53,13 @@ namespace Chuo {
             int ask_sum_volume = 0; // ask volume 总量
             int cur_position; // 当前仓位, 和昨日收盘仓位一致;
             int last_position = 0; // 昨日仓位
-            int cash = 0; // 现金
+            long long cash = 0; // 现金
+
             double pnl() {
-                return (double)cur_position * price_int2double(last_price) + price_int2double(cash)
+                static int id = 0;
+                std::cout << "[" << id++ << "]" << "cur_position: " << cur_position << " " << cash << " " << (double)cur_position * price_int2double(last_price) -
+                (double)last_position * price_int2double(prev_close_price) + (cash)/100.0 << std::endl;
+                return (double)cur_position * price_int2double(last_price) + cash / 100.0
                 - (double)last_position * price_int2double(prev_close_price);
             }
         };

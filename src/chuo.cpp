@@ -2,8 +2,10 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include<cstdio>
 
-// #define debugmode
+typedef long long ll;
+#define debugmode
 
 namespace Chuo {
 
@@ -133,9 +135,10 @@ namespace Chuo {
     static int trade_num = 0;
     const int debug_limit = 4500;
     static bool debug_mode = true;
-    static string debug_instrument_id = "000.UBE";
+    static string debug_instrument_id = "011.UBE";
     static bool debug_orders = false;
     static bool debug_trade = true;
+    static FILE *fp = fopen("debuglog.txt","w");
 
     int Worker::get_price(const order_log & order, bool is_alpha) {
         auto & bids_and_asks = get_instrument(char8_to_ull(order.instrument_id));
@@ -267,15 +270,16 @@ namespace Chuo {
                     //          " Dir:" << order.direction << " Volume:" << volume << " Price:" << trade_price << " 对手堆顶价格: "<< x.first.price << std::endl;
                     // printf("!%d ", order.timestamp);
                     debug_msg++;
-                    printf("[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), volume);
+                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), volume);
                 }
 #endif
                 reduce_one_dir(bidsAndAsks, volume, -direction); // 更新总量, 反向减少;
 
+
                 if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
-                    bidsAndAsks.cur_position -= volume * direction, bidsAndAsks.cash += direction * volume * trade_price; // 当前仓位是dir的反向; i.e., dir = 1, 堆顶的策略卖单成交了;
+                    bidsAndAsks.cur_position -= volume * direction, bidsAndAsks.cash += (direction) * volume * trade_price; // 当前仓位是dir的反向; i.e., dir = 1, 堆顶的策略卖单成交了;
                 if(is_alpha)
-                    bidsAndAsks.cur_position += volume * direction, bidsAndAsks.cash -= direction * volume * trade_price; // 如果当前order是策略单, 则直接有影响;
+                    bidsAndAsks.cur_position += volume * direction, bidsAndAsks.cash -= (direction) * volume * trade_price; // 如果当前order是策略单, 则直接有影响;
                 return 0;
             } else { // x.second < volume.
                 volume -= x.second;
@@ -284,14 +288,14 @@ namespace Chuo {
                     // std::cout << trade_num  << "<Trade>: <pop top>" << order.instrument_id << " T:" << order.timestamp << " Type:" << order.type <<
                     //          " Dir:" << order.direction << " Volume:" << x.second << " Price:" << trade_price  << " 对手堆顶价格: "<< x.first.price << std::endl;
                     debug_msg++;
-                    printf("[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), x.second);
+                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), x.second);
                 }
 #endif
                 reduce_one_dir(bidsAndAsks, x.second, -direction); // 更新总量, 反向减少;
                 if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
-                    bidsAndAsks.cur_position -= x.second * direction, bidsAndAsks.cash += direction * x.second * trade_price;
+                    bidsAndAsks.cur_position -= x.second * direction, bidsAndAsks.cash += (direction) * x.second * trade_price;
                 if(is_alpha)
-                    bidsAndAsks.cur_position += x.second * direction, bidsAndAsks.cash -= direction * x.second * trade_price;
+                    bidsAndAsks.cur_position += x.second * direction, bidsAndAsks.cash -= (direction) * x.second * trade_price;
                 pq.pop();
             }
         }
@@ -321,11 +325,11 @@ namespace Chuo {
                     //          " Dir:" << order.direction << " Volume:" << volume << " Price:" << abs(x.first.price) << " <全部成交>对手堆顶价格: "<< x.first.price << std::endl;
                     debug_msg++;
                     int trade_price = direction == 1? -x.first.price : x.first.price;
-                    printf("[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), volume);
+                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), volume);
                 }
 #endif
                 if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
-                    bidsAndAsks.cur_position -= volume * direction, bidsAndAsks.cash += direction * volume * abs(x.first.price); // 当前仓位是dir的反向; i.e., dir = 1, 堆顶的策略卖单成交了;
+                    bidsAndAsks.cur_position -= volume * direction, bidsAndAsks.cash += (direction) * volume * abs(x.first.price); // 当前仓位是dir的反向; i.e., dir = 1, 堆顶的策略卖单成交了;
                 return 0;
             } else {
                 volume -= x.second;
@@ -336,11 +340,11 @@ namespace Chuo {
                     //          " Dir:" << order.direction << " Volume:" << x.second << " Price:" << abs(x.first.price) << " <全部成交>对手堆顶价格: "<< x.first.price << std::endl;
                     debug_msg++;
                     int trade_price = direction == 1? -x.first.price : x.first.price;
-                    printf("[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), x.second);
+                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), x.second);
                 }
 #endif
                 if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
-                    bidsAndAsks.cur_position -= x.second * direction, bidsAndAsks.cash += direction * x.second * abs(x.first.price);
+                    bidsAndAsks.cur_position -= x.second * direction, bidsAndAsks.cash += (direction) * x.second * abs(x.first.price);
                 pq.pop();
             }
         }
