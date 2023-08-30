@@ -2,21 +2,27 @@
 /usr/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -G "CodeBlocks - Unix Makefiles" -S /home/team9/UbiquantSystem -B /home/team9/UbiquantSystem/cmake-build-release
 make -C /home/team9/UbiquantSystem/cmake-build-release
 
-
 rm /home/team9/pnl_and_pos/*
 rm /home/team9/twap_order/*
 
 # 记录当前时间(毫秒)
 start=$(date +%s%N)
+./cmake-build-release/main 20150101 3 1 & pid1=$!
+./cmake-build-release/main 20160202 3 1 & pid2=$!
+./cmake-build-release/main 20170303 3 1 & pid3=$!
+./cmake-build-release/main 20180404 3 1 & pid4=$!
 
-for i in $(ls /mnt/data)
-do
-  ./cmake-build-release/main $i 3 1 &
-  ./cmake-build-release/main $i 3 3 &
-  ./cmake-build-release/main $i 3 5 &
-  ./cmake-build-release/main $i 5 2 &
-  ./cmake-build-release/main $i 5 3 &
-done
+wait $pid1
+echo "./main 1 已完成"
+
+wait $pid2
+echo "./main 2 已完成"
+
+wait $pid3
+echo "./main 3 已完成"
+
+wait $pid4
+echo "./main 4 已完成"
 
 # 输出运行时间
 end=$(date +%s%N)
