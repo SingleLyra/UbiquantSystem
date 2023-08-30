@@ -1,3 +1,7 @@
+//
+// Created by Administrator on 2023/8/28.
+//
+
 #ifndef MAIN_CHUO_H
 #define MAIN_CHUO_H
 
@@ -25,6 +29,7 @@ namespace Chuo {
 
     double price_int2double(int price);
 
+    // TODO Perf: 调参 miniheap_size
     template <typename CMP>
     using PQ = rollbear::prio_queue<1024 /* miniheap_size */,
             PriceAndId /* Key first*/,
@@ -59,6 +64,8 @@ namespace Chuo {
             }
         };
 
+        // TODO Perf: 调 Hash
+        // char[8] 不知道看做 long long int 来 hash 会不会快点，他可能就取模
         unordered_map<unsigned long long int, BidsAndAsks> umap;
 
         Worker();

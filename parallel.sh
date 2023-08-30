@@ -1,8 +1,8 @@
 #!/bin/bash
-./build/main 20150101 3 1 & pid1=$!
-./build/main 20160202 3 1 & pid2=$!
-./build/main 20170303 3 1 & pid3=$!
-./build/main 20180404 3 1 & pid4=$!
+./cmake-build-release/main 20150101 3 1 & pid1=$!
+./cmake-build-release/main 20160202 3 1 & pid2=$!
+./cmake-build-release/main 20170303 3 1 & pid3=$!
+./cmake-build-release/main 20180404 3 1 & pid4=$!
 
 wait $pid1
 echo "./main 1 已完成"
