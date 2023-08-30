@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include<cstdio>
+#include <cstdio>
 
 typedef long long ll;
 #define debugmode
@@ -11,14 +11,21 @@ typedef long long ll;
 namespace Chuo {
 
     int price_double2int(double price) { // price只有2位小数， *100四舍五入
-        return (int)round(price * 100);
-
+        return round(price * 100);
     }
 
     double price_int2double(int price) { // price只有2位小数， /100
         return (double)price / 100;
     }
 
+    int round_mul(int price, int x) {
+        int tmp = price * x;
+        if (tmp % 100 >= 50) {
+            return tmp / 100 + 1;
+        } else {
+            return tmp / 100;
+        }
+    }
 
     Worker::Worker() {
         umap.reserve(3513);
@@ -30,8 +37,8 @@ namespace Chuo {
             auto & bid_and_asks = get_instrument(char8_to_ull(prev_trade_infos[i].instrument_id));
             bid_and_asks.prev_close_price = price_double2int(prev_trade_infos[i].prev_close_price);
             bid_and_asks.cur_position = bid_and_asks.last_position = prev_trade_infos[i].prev_position;
-            bid_and_asks.up_limit = price_double2int(prev_trade_infos[i].prev_close_price * 1.1);
-            bid_and_asks.down_limit = price_double2int(prev_trade_infos[i].prev_close_price * 0.9);
+            bid_and_asks.up_limit = round_mul(bid_and_asks.prev_close_price, 110);
+            bid_and_asks.down_limit = round_mul(bid_and_asks.prev_close_price, 90);
         }
     }
 
@@ -107,7 +114,7 @@ namespace Chuo {
             }
             // 4. 昨日收盘
             return bid_and_asks.prev_close_price;
-        } else {  
+        } else {
             // 1. 最高买入
             if (bid_and_asks.bid.size()) {
                 return get_bid(bid_and_asks);
@@ -133,7 +140,7 @@ namespace Chuo {
     static int trade_num = 0;
     const int debug_limit = 4500;
     static bool debug_mode = true;
-    static string debug_instrument_id = "011.UBE";
+    static string debug_instrument_id = "030.UBE";
     static bool debug_orders = false;
     static bool debug_trade = true;
     static FILE *fp = fopen("debuglog.txt","w");
@@ -152,10 +159,6 @@ namespace Chuo {
 
                 // 0.98~1.02
                 int price_off = price_double2int(order.price_off);
-                if(debug_mode && debug_orders && debug_instrument_id == order.instrument_id && debug_msg < debug_limit) {
-                    debug_msg ++;
-                    std::cout << "base_price: " << price_int2double(base_price) << " price_off: " << price_int2double(price_off) << std::endl;
-                }
                 if (price_off + base_price < bids_and_asks.down_limit) {
                     return -1;
                 }
@@ -163,11 +166,11 @@ namespace Chuo {
                     return -1;
                 }
                 if (order.direction == 1) {
-                    if (price_off + base_price > round(1.02 * base_price)) {
+                    if (price_off + base_price > round_mul(102, base_price)) {
                         return -1;
                     }
                 } else {
-                    if (price_off + base_price < round(0.98 * base_price)) {
+                    if (price_off + base_price < round_mul(98, base_price)) {
                         return -1;
                     }
                 }
