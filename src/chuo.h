@@ -6,35 +6,29 @@
 #define MAIN_CHUO_H
 
 #include "common.h"
-#include "prio_queue.hpp"
 #include "unordered_map"
+#include <queue>
 #include <cstring>
 #include "algorithm"
 
 namespace Chuo {
-    struct PriceAndId {
+    struct PriceAndIdAndVolume {
         int price;
         int order_id; // 压一位history bool, 压到 &1的位置去.
+        mutable int volume;
 
-        bool operator<(const PriceAndId & rhs) const {
+        bool operator<(const PriceAndIdAndVolume & rhs) const {
             return price == rhs.price ? order_id < rhs.order_id : price < rhs.price;
         }
-        bool operator>(const PriceAndId & rhs) const {
+        bool operator>(const PriceAndIdAndVolume & rhs) const {
             return price == rhs.price ? order_id < rhs.order_id : price > rhs.price;
         }
     };
-    using Volume = int;
 
     int price_double2int(double price);
-
     double price_int2double(int price);
 
-    // TODO Perf: 调参 miniheap_size
-    template <typename CMP>
-    using PQ = rollbear::prio_queue<1024 /* miniheap_size */,
-            PriceAndId /* Key first*/,
-            Volume /* Value second */, CMP>;
-    using BID_PQ = PQ<std::greater<PriceAndId>>; // 再想想.jpg 我去麦当劳(不是)
+    using BID_PQ = std::priority_queue<PriceAndIdAndVolume>;
     using std::unordered_map;
 
     class Worker {
@@ -56,16 +50,11 @@ namespace Chuo {
             long long cash = 0; // 现金
 
             double pnl() {
-                static int id = 0;
-                std::cout << "[" << id++ << "]" << "cur_position: " << cur_position << " " << cash << " " << (double)cur_position * price_int2double(last_price) -
-                (double)last_position * price_int2double(prev_close_price) + (cash)/100.0 << std::endl;
                 return (double)cur_position * price_int2double(last_price) + cash / 100.0
                 - (double)last_position * price_int2double(prev_close_price);
             }
         };
 
-        // TODO Perf: 调 Hash
-        // char[8] 不知道看做 long long int 来 hash 会不会快点，他可能就取模
         unordered_map<unsigned long long int, BidsAndAsks> umap;
 
         Worker();

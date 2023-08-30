@@ -6,7 +6,6 @@
 #include <cstdio>
 
 typedef long long ll;
-#define debugmode
 
 namespace Chuo {
 
@@ -31,7 +30,7 @@ namespace Chuo {
         umap.reserve(3513);
     }
 
-// 加载昨日收盘价格
+    // 加载昨日收盘价格
     void Worker::process_prev_trade(prev_trade_info prev_trade_infos[], size_t n) {
         for (int i = 0; i < n; i++) {
             auto & bid_and_asks = get_instrument(char8_to_ull(prev_trade_infos[i].instrument_id));
@@ -54,7 +53,6 @@ namespace Chuo {
             return strcmp(l.instrument_id, r.instrument_id) < 0;
         });
     }
-
 
     void Worker::output_pnl_and_pos(size_t prev_trades_size, string date, int session_number, int session_length) {
         string filename = "/home/team9/pnl_and_pos/" + date + "_" + std::to_string(session_number) + "_" + std::to_string(session_length);
@@ -89,11 +87,11 @@ namespace Chuo {
     }
 
     int Worker::get_bid(BidsAndAsks & bids_and_asks) {
-        return bids_and_asks.bid.top().first.price;
+        return bids_and_asks.bid.top().price;
     }
 
     int Worker::get_ask(BidsAndAsks & bids_and_asks) {
-        return -bids_and_asks.ask.top().first.price;
+        return -bids_and_asks.ask.top().price;
     }
 
     // 基准价格
@@ -255,48 +253,28 @@ namespace Chuo {
         // pq与order的dir相反.
         while(pq.size() && volume > 0) {
             const auto & x = pq.top();
-            if ( (direction == 1 && -x.first.price > price) || // 卖方价格 > 限价
-                 (direction == -1 && x.first.price < price) // 买方价格 < 限价
+            if ( (direction == 1 && -x.price > price) || // 卖方价格 > 限价
+                 (direction == -1 && x.price < price) // 买方价格 < 限价
                     ) {  // 没做成, 直接挂单. [适用于本方最优 与 限价单]
                 return volume;
             }
-            int trade_price = direction == 1? -x.first.price : x.first.price;
-            // TODO: 研究怎么成交
+            int trade_price = direction == 1? -x.price : x.price;
             bidsAndAsks.last_price = trade_price; // 更新最近成交价.
-            if (x.second > volume) {
-                x.second -= volume; // 更新堆顶的volume.
-#ifdef debugmode
-                if(debug_mode && debug_trade && debug_instrument_id == order.instrument_id && debug_msg < debug_limit) {
-                    // std::cout << trade_num << "<Trade>: <nothing>" << order.instrument_id << " T:" << order.timestamp << " Type:" << order.type <<
-                    //          " Dir:" << order.direction << " Volume:" << volume << " Price:" << trade_price << " 对手堆顶价格: "<< x.first.price << std::endl;
-                    // printf("!%d ", order.timestamp);
-                    debug_msg++;
-                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), volume);
-                }
-#endif
+            if (x.volume > volume) {
+                x.volume -= volume; // 更新堆顶的volume.
                 reduce_one_dir(bidsAndAsks, volume, -direction); // 更新总量, 反向减少;
-
-
-                if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
+                if(x.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
                     bidsAndAsks.cur_position -= volume * direction, bidsAndAsks.cash += (direction) * volume * trade_price; // 当前仓位是dir的反向; i.e., dir = 1, 堆顶的策略卖单成交了;
                 if(is_alpha)
                     bidsAndAsks.cur_position += volume * direction, bidsAndAsks.cash -= (direction) * volume * trade_price; // 如果当前order是策略单, 则直接有影响;
                 return 0;
             } else { // x.second < volume.
-                volume -= x.second;
-#ifdef debugmode
-                if(debug_mode && debug_trade && debug_instrument_id == order.instrument_id && debug_msg < debug_limit) {
-                    // std::cout << trade_num  << "<Trade>: <pop top>" << order.instrument_id << " T:" << order.timestamp << " Type:" << order.type <<
-                    //          " Dir:" << order.direction << " Volume:" << x.second << " Price:" << trade_price  << " 对手堆顶价格: "<< x.first.price << std::endl;
-                    debug_msg++;
-                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), x.second);
-                }
-#endif
-                reduce_one_dir(bidsAndAsks, x.second, -direction); // 更新总量, 反向减少;
-                if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
-                    bidsAndAsks.cur_position -= x.second * direction, bidsAndAsks.cash += (direction) * x.second * trade_price;
+                volume -= x.volume;
+                reduce_one_dir(bidsAndAsks, x.volume, -direction); // 更新总量, 反向减少;
+                if(x.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
+                    bidsAndAsks.cur_position -= x.volume * direction, bidsAndAsks.cash += (direction) * x.volume * trade_price;
                 if(is_alpha)
-                    bidsAndAsks.cur_position += x.second * direction, bidsAndAsks.cash -= (direction) * x.second * trade_price;
+                    bidsAndAsks.cur_position += x.volume * direction, bidsAndAsks.cash -= (direction) * x.volume * trade_price;
                 pq.pop();
             }
         }
@@ -305,47 +283,28 @@ namespace Chuo {
 
     int Worker::process_dynamic_price_order_level_5(const order_log& order, BID_PQ& pq, BidsAndAsks& bidsAndAsks) {
         unordered_map<int, bool>mp = unordered_map<int, bool>();
-        // 比较order.instrument_id, 输出“000.UBE”对应的order用于debug.
         int volume = order.volume,  direction = order.direction, cnt = 0;
         // pq与order的dir相反.
         while(pq.size() && volume > 0) {
             const auto & x = pq.top();
-            if(mp.find(abs(x.first.price)) == mp.end()) {
-                mp[abs(x.first.price)] = true;
+            if(mp.find(abs(x.price)) == mp.end()) {
+                mp[abs(x.price)] = true;
                 cnt ++;
             }
 
             if(order.type == 3 && cnt > 5) break; // type==3 只成交五次
-            bidsAndAsks.last_price = abs(x.first.price); // 更新最近成交价.
-            if (x.second > volume) {
-                x.second -= volume;
+            bidsAndAsks.last_price = abs(x.price); // 更新最近成交价.
+            if (x.volume > volume) {
+                x.volume -= volume;
                 reduce_one_dir(bidsAndAsks, volume, -direction); // 更新总量, 反向减少;
-#ifdef debugmode
-                if(debug_mode && debug_trade && debug_instrument_id == order.instrument_id && debug_msg < debug_limit) {
-                    // std::cout << trade_num << "<Trade>: <nothing>" << order.instrument_id << " T:" << order.timestamp << " Type:" << order.type <<
-                    //          " Dir:" << order.direction << " Volume:" << volume << " Price:" << abs(x.first.price) << " <全部成交>对手堆顶价格: "<< x.first.price << std::endl;
-                    debug_msg++;
-                    int trade_price = direction == 1? -x.first.price : x.first.price;
-                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), volume);
-                }
-#endif
-                if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
-                    bidsAndAsks.cur_position -= volume * direction, bidsAndAsks.cash += (direction) * volume * abs(x.first.price); // 当前仓位是dir的反向; i.e., dir = 1, 堆顶的策略卖单成交了;
+                if(x.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
+                    bidsAndAsks.cur_position -= volume * direction, bidsAndAsks.cash += (direction) * volume * abs(x.price); // 当前仓位是dir的反向; i.e., dir = 1, 堆顶的策略卖单成交了;
                 return 0;
             } else {
-                volume -= x.second;
-                reduce_one_dir(bidsAndAsks, x.second, -direction); // 更新总量, 反向减少;
-#ifdef debugmode
-                if(debug_mode && debug_trade && debug_instrument_id == order.instrument_id && debug_msg < debug_limit) {
-                    // std::cout << trade_num << "<Trade> <pop top>: " << order.instrument_id << " T:" << order.timestamp << " Type:" << order.type <<
-                    //          " Dir:" << order.direction << " Volume:" << x.second << " Price:" << abs(x.first.price) << " <全部成交>对手堆顶价格: "<< x.first.price << std::endl;
-                    debug_msg++;
-                    int trade_price = direction == 1? -x.first.price : x.first.price;
-                    fprintf(fp, "[%d] trade: price=%.6f, volume=%d\n", trade_num++, price_int2double(trade_price), x.second);
-                }
-#endif
-                if(x.first.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
-                    bidsAndAsks.cur_position -= x.second * direction, bidsAndAsks.cash += (direction) * x.second * abs(x.first.price);
+                volume -= x.volume;
+                reduce_one_dir(bidsAndAsks, x.volume, -direction); // 更新总量, 反向减少;
+                if(x.order_id & 1) // 堆内的time stamp是策略单的, 则需要更新仓位;
+                    bidsAndAsks.cur_position -= x.volume * direction, bidsAndAsks.cash += (direction) * x.volume * abs(x.price);
                 pq.pop();
             }
         }
@@ -358,10 +317,6 @@ namespace Chuo {
         auto & bids_and_asks = get_instrument(char8_to_ull(order.instrument_id)); 
         int price = get_price(order, is_alpha); // 如果是alpha单, 则会返回base price.
         if (price == -1) {
-            if(debug_mode && debug_orders && debug_instrument_id == order.instrument_id && debug_msg < debug_limit) {
-                std::cout << "Failed: "  << (is_alpha ? ("alpha: ") : ("history: ")) << order.instrument_id << " T:" << order.timestamp << " Type:" << order.type <<
-                          " Dir:" << order.direction << " Volume" << order.volume << " Price_Off:" << order.price_off << std::endl;
-            }
             return -1; // 价格检查失败;
         }
         auto& pq_diff = (order.direction == -1) ? bids_and_asks.bid : bids_and_asks.ask;
@@ -370,21 +325,15 @@ namespace Chuo {
         switch (order.type) {
             case 0:
             {
-                if(debug_mode && debug_orders && debug_instrument_id == order.instrument_id && debug_msg < debug_limit) {
-                    std::cout << "<Order>"  << (is_alpha ? ("alpha: ") : ("history: ")) << order.instrument_id << " T:" << order.timestamp << " Type:" << order.type <<
-                              " Dir:" << order.direction << " Volume" << order.volume << " Price_Off:" << order.price_off << std::endl;
-                }
                 int deal_volume = process_fix_price_order(order, is_alpha, price, pq_diff, bids_and_asks); // 需要买order.volume.
                 if (deal_volume > 0) {
                     // 当前order还有剩余, 需要加入堆中.
-                    pq_same.push(std::move(PriceAndId{order.direction * price, static_cast<int>(order.timestamp<<1|is_alpha)}),
-                                 deal_volume);
+                    pq_same.emplace(PriceAndIdAndVolume{order.direction * price, static_cast<int>(order.timestamp << 1 | is_alpha), deal_volume});
                     add_one_dir(bids_and_asks, deal_volume, order.direction); // 更新总量, 同向增加;
                 }
                 if (is_alpha) {
                     return price;
                 }
-
                 break;
             }
             case 1: // 对手方最优价格申报, 订单可能入队
@@ -392,8 +341,7 @@ namespace Chuo {
                 int deal_volume = process_fix_price_order(order, is_alpha, price, pq_diff, bids_and_asks);
                 if (deal_volume > 0) {
                     // 当前order还有剩余, 需要加入堆中.
-                    pq_same.push(PriceAndId{order.direction * price, static_cast<int>(order.timestamp<<1|is_alpha)},
-                                 deal_volume);
+                    pq_same.emplace(PriceAndIdAndVolume{order.direction * price, static_cast<int>(order.timestamp << 1 | is_alpha), deal_volume});
                     add_one_dir(bids_and_asks, deal_volume, order.direction); // 更新总量, 同向增加;
                 }
                 break;
@@ -403,8 +351,7 @@ namespace Chuo {
                 int deal_volume = process_fix_price_order(order, is_alpha, price, pq_diff, bids_and_asks);
                 if(deal_volume > 0) {
                     // 当前order还有剩余, 需要加入堆中.
-                    pq_same.push(PriceAndId{order.direction*price, static_cast<int>(order.timestamp<<1|is_alpha)},
-                                 deal_volume);
+                    pq_same.emplace(PriceAndIdAndVolume{order.direction * price, static_cast<int>(order.timestamp << 1 | is_alpha), deal_volume});
                     add_one_dir(bids_and_asks, deal_volume, order.direction); // 更新总量, 同向增加;
                 }
                 break;
@@ -430,14 +377,3 @@ namespace Chuo {
     }
 
 };
-
-/* int getbid() & int getask() are used to get the best bid and ask price
- * * 在访问PQ时, 不断弹出空订单, 直到遇到非空订单, 返回其价格. */
-// int getprice() is used to return the price of the order. <在内部讨论5种定价方案>
-// void make_order() is used to make an order. (加入撮合系统进行撮合)
-// void revert_order() is used to revert an order. (从撮合系统中撤回订单)
-// (因为某种原因: 1. 交易失败，部分撤销 2. 交易失败，全部撤销 3. 收盘的限价委托，策略单全部取消)
-/*
- * orders流 ->
- * alpha流->返回一个orders的vector.
- * */

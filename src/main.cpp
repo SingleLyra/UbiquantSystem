@@ -3,7 +3,6 @@
 #include "chuo.h"
 #include <algorithm>
 #include <cstring>
-#include <cmath>
 
 using namespace std;
 
