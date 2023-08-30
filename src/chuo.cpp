@@ -1,4 +1,5 @@
 #include "chuo.h"
+#include "common.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -48,13 +49,11 @@ namespace Chuo {
 
     void Worker::output_pnl_and_pos(size_t prev_trades_size, string date, int session_number, int session_length) {
         string filename = "/home/team9/pnl_and_pos/" + date + "_" + std::to_string(session_number) + "_" + std::to_string(session_length);
-        std::cout << filename << std::endl;
         FILE *fp = fopen(filename.c_str(), "wb");
         if (fp == nullptr) {
             std::cout << "open file failed" << std::endl;
             return;
         }
-        auto & pnl_and_poses = Singleton::get_instance().pnl_and_poses;
         fwrite(pnl_and_poses, sizeof(pnl_and_pos), prev_trades_size, fp);
         fclose(fp);
     }
@@ -67,7 +66,6 @@ namespace Chuo {
                 return l.timestamp < r.timestamp;
         });
         string filename = "/home/team9/twap_order/" + date + "_" + std::to_string(session_number) + "_" + std::to_string(session_length);
-        std::cout << filename << std::endl;
         FILE *fp = fopen(filename.c_str(), "wb");
         if (fp == nullptr) {
             std::cout << "open file failed" << std::endl;
@@ -89,7 +87,7 @@ namespace Chuo {
         return -bids_and_asks.ask.top().first.price;
     }
 
-// 基准价格
+    // 基准价格
     int Worker::get_base_price(BidsAndAsks & bid_and_asks, const order_log & order) {
         // 本方买入
         if (order.direction == 1) {
