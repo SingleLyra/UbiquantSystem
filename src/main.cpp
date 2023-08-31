@@ -29,7 +29,6 @@ static void bind_numa(){
 
 }*/
 
-
 //
 // $ main.out date
 //

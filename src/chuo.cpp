@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 #include <cstdio>
+#include <set>
 #include <fenv.h>
 
 namespace Chuo {
@@ -33,10 +34,40 @@ namespace Chuo {
     }
 
     Worker::Worker() {
+#ifdef HASH_USE_3BYTE
+#else
         umap.reserve(3513);
+#endif
     }
 
     void Worker::process_prev_trade(prev_trade_info prev_trade_infos[], size_t n) {
+#ifdef HASH_USE_3BYTE
+        int max_diff = 0;
+        for (int i = 0; i < 7; i++)
+            for (int j = 0; j < 7; j++)
+                for (int k = 0; k < 7; k++) {
+                    std::set<int> se;
+                    for (int l = 0; l < n; l++) {
+                        char * str = prev_trade_infos[l].instrument_id;
+                        int val = (((int)str[i] & 0b11) << 14) | (((int)str[j]) << 7) | str[k];
+                        se.insert(val);
+                    }
+                    if (max_diff < se.size()) {
+                        max_diff = se.size();
+                        x_idx = i;
+                        y_idx = j;
+                        z_idx = k;
+                    }
+                }
+
+        std::cout << "Hash 3 Bytes can diff " << max_diff << "/" << n << std::endl;
+        for (int i = 0; i < n; i++) {
+            char * str = prev_trade_infos[i].instrument_id;
+            int val = (((int)str[x_idx] & 0b11) << 14) | (((int)str[y_idx]) << 7) | str[z_idx];
+            hash[val].emplace_back(*(unsigned long long int *)str, BidsAndAsks{});
+        }
+#else
+#endif
         for (int i = 0; i < n; i++) {
             auto & bid_and_asks = get_instrument(prev_trade_infos[i].instrument_id);
             bid_and_asks.prev_close_price = price_double2int(prev_trade_infos[i].prev_close_price);
@@ -92,7 +123,16 @@ namespace Chuo {
     // ======================================
 
     Worker::BidsAndAsks & Worker::get_instrument(const char * instrument_id) {
+#ifdef HASH_USE_3BYTE
+        int val = (((int)instrument_id[x_idx] & 0b11) << 14) | (((int)instrument_id[y_idx]) << 7) | instrument_id[z_idx];
+        auto it = hash[val].begin();
+        while (it->first != *(unsigned long long int *)instrument_id) {
+            ++it;
+        }
+        return it->second;
+#else
         return umap[*(unsigned long long int *)instrument_id];
+#endif
     }
 
     int Worker::get_bid(BidsAndAsks & bids_and_asks) const {

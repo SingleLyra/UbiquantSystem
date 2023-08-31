@@ -11,6 +11,7 @@
 #include <queue>
 #include <cstring>
 #include <vector>
+#include <list>
 #include "algorithm"
 
 namespace Chuo {
@@ -58,7 +59,12 @@ namespace Chuo {
             }
         };
 
+#ifdef HASH_USE_3BYTE
+        int x_idx = 0, y_idx = 0, z_idx = 0;
+        std::list<std::pair<unsigned long long int, BidsAndAsks>> hash[65536];
+#else
         unordered_map<unsigned long long int, BidsAndAsks> umap;
+#endif
 
         Worker();
 
