@@ -158,7 +158,7 @@ void deal_orders(const string & date) {
 
     for (int i = 0; i < 5; i++) {
         worker[i].output_answer(date);
-   }
+    }
 }
 
 int main(int argc, char * argv[]) {
