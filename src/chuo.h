@@ -86,6 +86,14 @@ namespace Chuo {
         int BID_process_dynamic_price_order_level_5(const order_log& order, BidsAndAsks& bidsAndAsks);
         int BID_process_fix_price_order(const order_log& order, bool is_alpha, int price, BidsAndAsks& bidsAndAsks);
         int BID_get_base_price(BidsAndAsks & bid_and_asks);
+
+        int
+        output_pnl_and_pos_to_network(size_t prev_trades_size, string date, int session_number, int session_length,
+                                      int sockfd,
+                                      int N, char *buffer);
+
+        int output_twap_order_to_network(twap_order *twap_orders, size_t twap_size, string date, int session_number,
+                                          int session_length, int sockfd, int N, char *buffer);
     };
 };
 

@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <set>
 #include <fenv.h>
+#include <sys/socket.h>
 
 namespace Chuo {
     // ======================================
@@ -117,6 +118,53 @@ namespace Chuo {
         fwrite(twap_orders, sizeof(twap_order), twap_size, fp);
         fclose(fp);
     }
+
+#ifdef NETWORK_SEND
+// 包顺序: twap头, twap, pnl_and_pos头，pos)
+
+    int my_send(int sockfd, char *buffer, size_t size) {
+        int sended_num = 0;
+        while (sended_num < size) {
+            int ret = send(sockfd, buffer + sended_num, size - sended_num, 0);
+            if (ret <= 0) {
+                return -1;
+            }
+            sended_num += ret;
+        }
+        return sended_num;
+    }
+
+
+    int Worker::output_twap_order_to_network(twap_order twap_orders[], size_t twap_size, string date, int session_number, int session_length, int sockfd, int N, char *buffer) {
+        unsigned size = sizeof(twap_order) * twap_size;
+        memcpy(buffer, &size, sizeof(unsigned));
+        memcpy(buffer + sizeof(unsigned), date.c_str(), 9);
+        memcpy(buffer + sizeof(unsigned) + 9, &session_number, sizeof(int));
+        memcpy(buffer + sizeof(unsigned) + 9 + sizeof(int), &session_length, sizeof(int));
+        if (my_send(sockfd, buffer, sizeof(unsigned) + sizeof(int) + sizeof(int) + 9) == -1) {
+            return -1;
+        }
+        if (my_send(sockfd, (char *)twap_orders, sizeof(twap_order) * twap_size) == -1) {
+            return -1;
+        }
+        return 0;
+    }
+
+    int Worker::output_pnl_and_pos_to_network(size_t prev_trades_size, string date, int session_number, int session_length, int sockfd, int N, char *buffer) {
+        unsigned size = sizeof(pnl_and_pos) * prev_trades_size;
+        memcpy(buffer, &size, sizeof(unsigned));
+        memcpy(buffer + sizeof(unsigned), date.c_str(), 9);
+        memcpy(buffer + sizeof(unsigned) + 9, &session_number, sizeof(int));
+        memcpy(buffer + sizeof(unsigned) + 9 + sizeof(int), &session_length, sizeof(int));
+        if (my_send(sockfd, buffer, sizeof(unsigned) + sizeof(int) + sizeof(int) + 9) == -1) {
+            return -1;
+        }
+        if (my_send(sockfd, (char *)pnl_and_poses, sizeof(pnl_and_pos) * prev_trades_size) == -1) {
+            return -1;
+        }
+        return 0;
+    }
+#endif
 
     // ======================================
     // =========== 调用频繁 ==================
