@@ -2,6 +2,7 @@
 #define MAIN_COMMON_H
 
 #define HASH_USE_3BYTE
+#define NETWORK_SEND
 
 #include <iostream>
 #include <vector>

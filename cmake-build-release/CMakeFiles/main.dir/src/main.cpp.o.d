@@ -152,4 +152,13 @@ CMakeFiles/main.dir/src/main.cpp.o: \
  /usr/include/c++/8/backward/auto_ptr.h \
  /usr/include/c++/8/condition_variable /usr/include/c++/8/fenv.h \
  /usr/include/fenv.h /usr/include/bits/fenv.h \
- /usr/include/bits/fenvinline.h
+ /usr/include/bits/fenvinline.h /usr/include/sys/socket.h \
+ /usr/include/bits/types/struct_iovec.h /usr/include/bits/socket.h \
+ /usr/include/bits/socket_type.h /usr/include/bits/sockaddr.h \
+ /usr/include/asm/socket.h /usr/include/asm-generic/socket.h \
+ /usr/include/asm/sockios.h /usr/include/asm-generic/sockios.h \
+ /usr/include/bits/types/struct_osockaddr.h /usr/include/netinet/in.h \
+ /usr/include/bits/in.h /usr/include/arpa/inet.h /usr/include/unistd.h \
+ /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+ /usr/include/bits/confname.h /usr/include/bits/getopt_posix.h \
+ /usr/include/bits/getopt_core.h

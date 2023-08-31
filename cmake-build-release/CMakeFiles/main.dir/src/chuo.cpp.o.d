@@ -160,4 +160,9 @@ CMakeFiles/main.dir/src/chuo.cpp.o: \
  /usr/include/c++/8/bits/stl_tree.h /usr/include/c++/8/bits/stl_set.h \
  /usr/include/c++/8/bits/stl_multiset.h /usr/include/c++/8/fenv.h \
  /usr/include/fenv.h /usr/include/bits/fenv.h \
- /usr/include/bits/fenvinline.h
+ /usr/include/bits/fenvinline.h /usr/include/sys/socket.h \
+ /usr/include/bits/types/struct_iovec.h /usr/include/bits/socket.h \
+ /usr/include/bits/socket_type.h /usr/include/bits/sockaddr.h \
+ /usr/include/asm/socket.h /usr/include/asm-generic/socket.h \
+ /usr/include/asm/sockios.h /usr/include/asm-generic/sockios.h \
+ /usr/include/bits/types/struct_osockaddr.h

@@ -7,9 +7,19 @@
 #include <thread>
 #include <condition_variable>
 #include <fenv.h>
-// #include <numaif.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 using namespace std;
+
+/* 用于网络传输 */
+static std::string ipa = "172.28.142.150";
+static std::string ipb = "172.28.142.148";
+static int port_answer_send;
+const int N = 3600;
+char buffer[N];
 
 struct OneSessionWorker {
     int session_number;
@@ -78,11 +88,29 @@ struct OneSessionWorker {
         worker.make_order(order, false);
     }
 
-    void output_answer(const string & date) {
+    void calc_pnl_and_pos() {
         worker.calc_pnl_and_pos(prev_trade_infos, pnl_and_poses, prev_trades_size);
+    }
+
+    void output_answer_local(const string & date) {
         worker.output_pnl_and_pos(prev_trades_size, date, session_number, session_length);
         worker.output_twap_order(twap_orders, twaps_size, date, session_number, session_length);
     }
+
+#ifdef NETWORK_SEND
+    int output_answer_network(const string & date, int sockfd) {
+        int ret = worker.output_twap_order_to_network(twap_orders, twaps_size, date, session_number, session_length, sockfd, N, buffer);
+        if (ret == -1) {
+            return -1;
+        }
+        ret = worker.output_pnl_and_pos_to_network(prev_trades_size, date, session_number, session_length, sockfd, N, buffer);
+        if (ret == -1) {
+            return -1;
+        }
+        return 0;
+    }
+#endif
+
 };
 
 OneSessionWorker worker[5];
@@ -133,14 +161,50 @@ void deal_orders(const string & date) {
         }
     }
 
-    for (int i = 0; i < 5; i++) {
-        worker[i].output_answer(date);
+#ifdef NETWORK_SEND
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in serverAddr{};
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(port_answer_send);
+    inet_pton(AF_INET, ipb.c_str(), &serverAddr.sin_addr);
+    if (connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
+        // 没连接上 本地输出
+        // 本地的文件都是没发过去的 dui
+        // 那就在shell里面check下现在的文件夹
+        perror("connect failed");
+        for (int i = 0; i < 5; i++) {
+            worker[i].calc_pnl_and_pos();
+            worker[i].output_answer_local(date);
+        }
+    } else {
+        // 网络发送
+        printf("connect success\n");
+        for (int i = 0; i < 5; i++) {
+            worker[i].calc_pnl_and_pos();
+            int ret = worker[i].output_answer_network(date, sockfd);
+            if (ret == -1) {
+                // send failed
+                worker[i].output_answer_local(date);
+            }
+        }
+        close(sockfd);
     }
+#else
+    for (int i = 0; i < 5; i++) {
+        worker[i].calc_pnl_and_pos();
+        worker[i].output_answer_local(date);
+    }
+#endif
 }
 
 int main(int argc, char * argv[]) {
+#ifndef NETWORK_SEND
+    cout << "warning: " << "not using network send" << endl;
+#endif
+
     string date(argv[1]);
     fesetround(FE_TONEAREST); // use rint replace round, faster
+    port_answer_send = {atoi(argv[2])};
 
     size_t prev_trades_size = read_prev_trade_info(date);
     size_t alphas_size = read_alpha(date);
