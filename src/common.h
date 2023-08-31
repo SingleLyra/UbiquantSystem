@@ -1,6 +1,8 @@
 #ifndef MAIN_COMMON_H
 #define MAIN_COMMON_H
 
+#define HASH_USE_3BYTE
+
 #include <iostream>
 #include <vector>
 
