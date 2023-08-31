@@ -11,28 +11,6 @@
 
 using namespace std;
 
-/*
-static void bind_numa(){
-    if (numa_available() < 0) {
-        std::cerr << "NUMA is not available on this system." << std::endl;
-        return 1;
-    }
-
-    // Set the preferred node and bind the current thread to it
-    int preferredNode = 0;  // Change this to the desired NUMA node
-    numa_set_preferred(preferredNode);
-
-    if (numa_run_on_node(preferredNode) < 0) {
-        std::cerr << "Failed to bind thread to NUMA node." << std::endl;
-        return 1;
-    }
-
-}*/
-
-//
-// $ main.out date
-//
-
 struct OneSessionWorker {
     int session_number;
     int session_length;
