@@ -29,7 +29,6 @@ static void bind_numa(){
 
 }*/
 
-
 //
 // $ main.out date
 //
@@ -102,7 +101,7 @@ struct OneSessionWorker {
     }
 
     void output_answer(const string & date) {
-        worker.calc_pnl_and_pos(prev_trade_infos, pnl_and_poses, worker.umap.size() - 1); // magic number: size - 1
+        worker.calc_pnl_and_pos(prev_trade_infos, pnl_and_poses, prev_trades_size);
         worker.output_pnl_and_pos(prev_trades_size, date, session_number, session_length);
         worker.output_twap_order(twap_orders, twaps_size, date, session_number, session_length);
     }
@@ -158,7 +157,7 @@ void deal_orders(const string & date) {
 
     for (int i = 0; i < 5; i++) {
         worker[i].output_answer(date);
-   }
+    }
 }
 
 int main(int argc, char * argv[]) {

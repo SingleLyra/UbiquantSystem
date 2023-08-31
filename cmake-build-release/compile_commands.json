@@ -1,27 +1,27 @@
 [
 {
   "directory": "/home/team9/UbiquantSystem/cmake-build-release",
-  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2 -std=c++17 -o CMakeFiles/main.dir/src/chuo.cpp.o -c /home/team9/UbiquantSystem/src/chuo.cpp",
+  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O3 -std=c++17 -o CMakeFiles/main.dir/src/chuo.cpp.o -c /home/team9/UbiquantSystem/src/chuo.cpp",
   "file": "/home/team9/UbiquantSystem/src/chuo.cpp"
 },
 {
   "directory": "/home/team9/UbiquantSystem/cmake-build-release",
-  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2 -std=c++17 -o CMakeFiles/main.dir/src/common.cpp.o -c /home/team9/UbiquantSystem/src/common.cpp",
+  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O3 -std=c++17 -o CMakeFiles/main.dir/src/common.cpp.o -c /home/team9/UbiquantSystem/src/common.cpp",
   "file": "/home/team9/UbiquantSystem/src/common.cpp"
 },
 {
   "directory": "/home/team9/UbiquantSystem/cmake-build-release",
-  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2 -std=c++17 -o CMakeFiles/main.dir/src/main.cpp.o -c /home/team9/UbiquantSystem/src/main.cpp",
+  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O3 -std=c++17 -o CMakeFiles/main.dir/src/main.cpp.o -c /home/team9/UbiquantSystem/src/main.cpp",
   "file": "/home/team9/UbiquantSystem/src/main.cpp"
 },
 {
   "directory": "/home/team9/UbiquantSystem/cmake-build-release",
-  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2 -std=c++17 -o CMakeFiles/main.dir/src/readlogs.cpp.o -c /home/team9/UbiquantSystem/src/readlogs.cpp",
+  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O3 -std=c++17 -o CMakeFiles/main.dir/src/readlogs.cpp.o -c /home/team9/UbiquantSystem/src/readlogs.cpp",
   "file": "/home/team9/UbiquantSystem/src/readlogs.cpp"
 },
 {
   "directory": "/home/team9/UbiquantSystem/cmake-build-release",
-  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O2 -std=c++17 -o CMakeFiles/main.dir/src/writetrade.cpp.o -c /home/team9/UbiquantSystem/src/writetrade.cpp",
+  "command": "/usr/bin/g++  -I/home/team9/UbiquantSystem/submodules/prio_queue  -march=native -mtune=native -fno-trapping-math -funroll-loops -flto -finline-functions -fomit-frame-pointer -lpthread -O3 -DNDEBUG -O3 -std=c++17 -o CMakeFiles/main.dir/src/writetrade.cpp.o -c /home/team9/UbiquantSystem/src/writetrade.cpp",
   "file": "/home/team9/UbiquantSystem/src/writetrade.cpp"
 }
 ]

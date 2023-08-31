@@ -126,15 +126,18 @@ CMakeFiles/main.dir/src/main.cpp.o: \
  /usr/include/c++/8/bits/invoke.h /usr/include/c++/8/bits/node_handle.h \
  /usr/include/c++/8/optional \
  /usr/include/c++/8/bits/enable_special_members.h \
- /usr/include/c++/8/bits/unordered_map.h /usr/include/c++/8/queue \
- /usr/include/c++/8/deque /usr/include/c++/8/bits/stl_deque.h \
- /usr/include/c++/8/bits/deque.tcc /usr/include/c++/8/bits/stl_heap.h \
- /usr/include/c++/8/bits/stl_queue.h /usr/include/c++/8/cstring \
- /usr/include/string.h /usr/include/strings.h \
- /usr/include/c++/8/algorithm /usr/include/c++/8/bits/stl_algo.h \
+ /usr/include/c++/8/bits/unordered_map.h /usr/include/c++/8/functional \
+ /usr/include/c++/8/bits/refwrap.h /usr/include/c++/8/bits/std_function.h \
+ /usr/include/c++/8/bits/stl_algo.h \
  /usr/include/c++/8/bits/algorithmfwd.h \
- /usr/include/c++/8/bits/stl_tempbuf.h \
- /usr/include/c++/8/bits/uniform_int_dist.h /usr/include/c++/8/mutex \
+ /usr/include/c++/8/bits/stl_heap.h /usr/include/c++/8/bits/stl_tempbuf.h \
+ /usr/include/c++/8/bits/uniform_int_dist.h /usr/include/c++/8/queue \
+ /usr/include/c++/8/deque /usr/include/c++/8/bits/stl_deque.h \
+ /usr/include/c++/8/bits/deque.tcc /usr/include/c++/8/bits/stl_queue.h \
+ /usr/include/c++/8/cstring /usr/include/string.h /usr/include/strings.h \
+ /usr/include/c++/8/list /usr/include/c++/8/bits/stl_list.h \
+ /usr/include/c++/8/bits/allocated_ptr.h /usr/include/c++/8/bits/list.tcc \
+ /usr/include/c++/8/algorithm /usr/include/c++/8/mutex \
  /usr/include/c++/8/chrono /usr/include/c++/8/ratio \
  /usr/include/c++/8/ctime /usr/include/c++/8/bits/parse_numbers.h \
  /usr/include/c++/8/bits/std_mutex.h /usr/include/c++/8/thread \
@@ -143,8 +146,6 @@ CMakeFiles/main.dir/src/main.cpp.o: \
  /usr/include/c++/8/bits/unique_ptr.h \
  /usr/include/c++/8/bits/shared_ptr.h \
  /usr/include/c++/8/bits/shared_ptr_base.h \
- /usr/include/c++/8/bits/allocated_ptr.h \
- /usr/include/c++/8/bits/refwrap.h \
  /usr/include/c++/8/bits/shared_ptr_atomic.h \
  /usr/include/c++/8/bits/atomic_base.h \
  /usr/include/c++/8/bits/atomic_lockfree_defines.h \

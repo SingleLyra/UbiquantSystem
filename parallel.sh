@@ -1,7 +1,7 @@
 #!/bin/bash
+rm -rf /home/team9/UbiquantSystem/cmake-build-release
 /usr/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -G "CodeBlocks - Unix Makefiles" -S /home/team9/UbiquantSystem -B /home/team9/UbiquantSystem/cmake-build-release
 make -C /home/team9/UbiquantSystem/cmake-build-release
-
 
 rm /home/team9/pnl_and_pos/*
 rm /home/team9/twap_order/*
