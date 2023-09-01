@@ -167,7 +167,7 @@ void deal_orders(const string & date) {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port_answer_send);
     inet_pton(AF_INET, ipb.c_str(), &serverAddr.sin_addr);
-    if (connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
+    if (connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         // 没连接上 本地输出
         // 本地的文件都是没发过去的 dui
         // 那就在shell里面check下现在的文件夹
